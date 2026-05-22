@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dot Grid Generator</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <div class="logo">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <circle cx="4" cy="4" r="2" fill="currentColor"/>
+            <circle cx="10" cy="4" r="2" fill="currentColor"/>
+            <circle cx="16" cy="4" r="2" fill="currentColor"/>
+            <circle cx="4" cy="10" r="2" fill="currentColor"/>
+            <circle cx="10" cy="10" r="2" fill="currentColor"/>
+            <circle cx="16" cy="10" r="2" fill="currentColor"/>
+            <circle cx="4" cy="16" r="2" fill="currentColor"/>
+            <circle cx="10" cy="16" r="2" fill="currentColor"/>
+            <circle cx="16" cy="16" r="2" fill="currentColor"/>
+          </svg>
+          <span>Dot Grid</span>
+        </div>
+      </div>
+      <div class="header-right">
+        <button class="btn btn-ghost" id="btnShareUrl" title="Copy shareable URL">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          Share
+        </button>
+        <button class="btn btn-primary" id="btnExport">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export
+        </button>
+      </div>
+    </header>
+
+    <div class="workspace">
+
+      <!-- Controls Panel -->
+      <aside class="panel" id="panel">
+        <div class="panel-scroll">
+
+          <!-- Presets -->
+          <section class="section">
+            <div class="section-header">
+              <span class="section-title">Presets</span>
+            </div>
+            <div class="preset-grid" id="presetGrid"></div>
+          </section>
+
+          <!-- Grid -->
+          <section class="section">
+            <div class="section-header collapsible" data-target="sectionGrid">
+              <span class="section-title">Grid</span>
+              <svg class="chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="section-body" id="sectionGrid">
+
+              <div class="control-row">
+                <label>Type</label>
+                <div class="segmented" id="gridType">
+                  <button class="seg-btn active" data-value="square">Square</button>
+                  <button class="seg-btn" data-value="hex">Hex</button>
+                  <button class="seg-btn" data-value="radial">Radial</button>
+                  <button class="seg-btn" data-value="diagonal">Diagonal</button>
+                </div>
+              </div>
+
+              <div class="control-row">
+                <label>Spacing X <span class="val" id="valSpacingX">40</span>px</label>
+                <input type="range" id="spacingX" min="10" max="120" value="40" />
+              </div>
+              <div class="control-row">
+                <label>Spacing Y <span class="val" id="valSpacingY">40</span>px</label>
+                <input type="range" id="spacingY" min="10" max="120" value="40" />
+              </div>
+              <div class="control-row">
+                <label class="checkbox-label">
+                  <input type="checkbox" id="linkSpacing" checked />
+                  <span>Link X/Y spacing</span>
+                </label>
+              </div>
+
+              <div class="control-row" id="radialControls" style="display:none">
+                <label>Rings <span class="val" id="valRings">8</span></label>
+                <input type="range" id="rings" min="2" max="20" value="8" />
+              </div>
+              <div class="control-row" id="radialDotsControls" style="display:none">
+                <label>Dots/Ring <span class="val" id="valDotsPerRing">12</span></label>
+                <input type="range" id="dotsPerRing" min="4" max="36" value="12" />
+              </div>
+
+            </div>
+          </section>
+
+          <!-- Dots -->
+          <section class="section">
+            <div class="section-header collapsible" data-target="sectionDots">
+              <span class="section-title">Dots</span>
+              <svg class="chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="section-body" id="sectionDots">
+
+              <div class="control-row">
+                <label>Shape</label>
+                <div class="segmented" id="dotShape">
+                  <button class="seg-btn active" data-value="circle">●</button>
+                  <button class="seg-btn" data-value="square">■</button>
+                  <button class="seg-btn" data-value="diamond">◆</button>
+                  <button class="seg-btn" data-value="ring">○</button>
+                  <button class="seg-btn" data-value="cross">+</button>
+                </div>
+              </div>
+
+              <div class="control-row">
+                <label>Size <span class="val" id="valDotSize">3</span>px</label>
+                <input type="range" id="dotSize" min="1" max="24" value="3" />
+              </div>
+
+              <div class="control-row" id="strokeWidthRow" style="display:none">
+                <label>Stroke <span class="val" id="valStrokeWidth">1</span>px</label>
+                <input type="range" id="strokeWidth" min="0.5" max="4" step="0.5" value="1" />
+              </div>
+
+              <div class="control-row">
+                <label>Opacity <span class="val" id="valDotOpacity">100</span>%</label>
+                <input type="range" id="dotOpacity" min="0" max="100" value="100" />
+              </div>
+
+            </div>
+          </section>
+
+          <!-- Colour -->
+          <section class="section">
+            <div class="section-header collapsible" data-target="sectionColor">
+              <span class="section-title">Colour</span>
+              <svg class="chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="section-body" id="sectionColor">
+
+              <div class="control-row">
+                <label>Background</label>
+                <div class="color-row">
+                  <input type="color" id="bgColor" value="#0a0a0f" class="color-swatch" />
+                  <input type="text" id="bgColorText" value="#0a0a0f" class="color-text" maxlength="7" />
+                </div>
+              </div>
+
+              <div class="control-row">
+                <label>Dot Color Mode</label>
+                <div class="segmented" id="dotColorMode">
+                  <button class="seg-btn active" data-value="solid">Solid</button>
+                  <button class="seg-btn" data-value="gradient">Gradient</button>
+                  <button class="seg-btn" data-value="palette">Palette</button>
+                </div>
+              </div>
+
+              <div id="solidColorControls">
+                <div class="control-row">
+                  <label>Dot Color</label>
+                  <div class="color-row">
+                    <input type="color" id="dotColor" value="#4f7fff" class="color-swatch" />
+                    <input type="text" id="dotColorText" value="#4f7fff" class="color-text" maxlength="7" />
+                  </div>
+                </div>
+              </div>
+
+              <div id="gradientColorControls" style="display:none">
+                <div class="control-row">
+                  <label>Color A</label>
+                  <div class="color-row">
+                    <input type="color" id="gradColorA" value="#4f7fff" class="color-swatch" />
+                    <input type="text" id="gradColorAText" value="#4f7fff" class="color-text" maxlength="7" />
+                  </div>
+                </div>
+                <div class="control-row">
+                  <label>Color B</label>
+                  <div class="color-row">
+                    <input type="color" id="gradColorB" value="#ff4fa0" class="color-swatch" />
+                    <input type="text" id="gradColorBText" value="#ff4fa0" class="color-text" maxlength="7" />
+                  </div>
+                </div>
+                <div class="control-row">
+                  <label>Gradient Direction</label>
+                  <div class="segmented" id="gradientDir">
+                    <button class="seg-btn active" data-value="horizontal">H</button>
+                    <button class="seg-btn" data-value="vertical">V</button>
+                    <button class="seg-btn" data-value="diagonal">D</button>
+                    <button class="seg-btn" data-value="radial">R</button>
+                  </div>
+                </div>
+              </div>
+
+              <div id="paletteColorControls" style="display:none">
+                <div class="control-row">
+                  <label>Palette</label>
+                  <div class="palette-picker" id="palettePicker"></div>
+                </div>
+              </div>
+
+            </div>
+          </section>
+
+          <!-- Animation -->
+          <section class="section">
+            <div class="section-header collapsible" data-target="sectionAnim">
+              <span class="section-title">Animation</span>
+              <svg class="chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="section-body" id="sectionAnim">
+
+              <div class="control-row">
+                <label>Type</label>
+                <select id="animType" class="select">
+                  <option value="none">None</option>
+                  <option value="pulse">Pulse</option>
+                  <option value="wave">Wave</option>
+                  <option value="breathe">Breathe</option>
+                  <option value="noise">Noise</option>
+                  <option value="spotlight">Spotlight</option>
+                  <option value="orbit">Orbit</option>
+                  <option value="flow">Flow</option>
+                  <option value="ripple">Ripple</option>
+                  <option value="cascade">Cascade</option>
+                </select>
+              </div>
+
+              <div class="control-row">
+                <label>Speed <span class="val" id="valAnimSpeed">50</span></label>
+                <input type="range" id="animSpeed" min="1" max="100" value="50" />
+              </div>
+
+              <div class="control-row">
+                <label>Amplitude <span class="val" id="valAmplitude">50</span></label>
+                <input type="range" id="amplitude" min="0" max="100" value="50" />
+              </div>
+
+              <div class="control-row" id="staggerRow">
+                <label>Stagger <span class="val" id="valStagger">0</span></label>
+                <input type="range" id="stagger" min="0" max="100" value="0" />
+              </div>
+
+              <div class="control-row" id="frequencyRow">
+                <label>Frequency <span class="val" id="valFrequency">50</span></label>
+                <input type="range" id="frequency" min="1" max="100" value="50" />
+              </div>
+
+              <div class="control-row" id="noiseSeedRow" style="display:none">
+                <label>Noise Seed <span class="val" id="valNoiseSeed">1</span></label>
+                <input type="range" id="noiseSeed" min="1" max="100" value="1" />
+              </div>
+
+              <div class="control-row">
+                <label>Opacity Range</label>
+                <div class="dual-range-row">
+                  <input type="range" id="opacityMin" min="0" max="100" value="20" class="range-half" />
+                  <span class="val" id="valOpacityMin">20</span>
+                  <span class="sep">→</span>
+                  <input type="range" id="opacityMax" min="0" max="100" value="100" class="range-half" />
+                  <span class="val" id="valOpacityMax">100</span>
+                </div>
+              </div>
+
+              <div class="control-row">
+                <label class="checkbox-label">
+                  <input type="checkbox" id="mouseInteract" />
+                  <span>Mouse interaction</span>
+                </label>
+              </div>
+
+              <div id="mouseControls" style="display:none">
+                <div class="control-row">
+                  <label>Mouse Effect</label>
+                  <div class="segmented" id="mouseEffect">
+                    <button class="seg-btn active" data-value="spotlight">Spotlight</button>
+                    <button class="seg-btn" data-value="repel">Repel</button>
+                    <button class="seg-btn" data-value="attract">Attract</button>
+                  </div>
+                </div>
+                <div class="control-row">
+                  <label>Radius <span class="val" id="valMouseRadius">120</span>px</label>
+                  <input type="range" id="mouseRadius" min="20" max="300" value="120" />
+                </div>
+              </div>
+
+            </div>
+          </section>
+
+        </div>
+      </aside>
+
+      <!-- Preview -->
+      <main class="preview-area">
+        <div class="preview-toolbar">
+          <div class="preview-size">
+            <input type="number" id="previewW" value="1440" min="100" max="3840" />
+            <span>×</span>
+            <input type="number" id="previewH" value="900" min="100" max="2160" />
+            <button class="btn btn-ghost btn-sm" id="btnFitCanvas">Fit</button>
+          </div>
+          <div class="preview-actions">
+            <button class="btn btn-ghost btn-sm" id="btnPause" title="Pause animation">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+            </button>
+            <button class="btn btn-ghost btn-sm" id="btnReset" title="Reset animation">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.51"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="canvas-container" id="canvasContainer">
+          <canvas id="dotCanvas"></canvas>
+        </div>
+      </main>
+
+    </div>
+  </div>
+
+  <!-- Export Modal -->
+  <div class="modal-overlay" id="exportModal" style="display:none">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Export</h3>
+        <button class="modal-close" id="btnCloseExport">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="export-tabs">
+          <button class="export-tab active" data-tab="css">CSS</button>
+          <button class="export-tab" data-tab="svg">SVG</button>
+          <button class="export-tab" data-tab="png">PNG</button>
+          <button class="export-tab" data-tab="js">JS Snippet</button>
+        </div>
+        <div class="export-content" id="exportContent">
+          <pre class="code-block" id="exportCode"></pre>
+        </div>
+        <div class="export-actions">
+          <button class="btn btn-ghost" id="btnCopyExport">Copy to clipboard</button>
+          <button class="btn btn-primary" id="btnDownloadExport">Download</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script src="presets.js"></script>
+  <script src="renderer.js"></script>
+  <script src="exporter.js"></script>
+  <script src="controls.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
