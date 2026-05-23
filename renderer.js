@@ -78,12 +78,22 @@ function lerpColor(a, b, t) {
   return `rgb(${Math.round(ca[0]+(cb[0]-ca[0])*t)},${Math.round(ca[1]+(cb[1]-ca[1])*t)},${Math.round(ca[2]+(cb[2]-ca[2])*t)})`;
 }
 
+function lerpMultiColor(colors, t) {
+  const n = colors.length;
+  if (n === 1) return colors[0];
+  const scaled = Math.max(0, Math.min(1, t)) * (n - 1);
+  const i = Math.min(Math.floor(scaled), n - 2);
+  return lerpColor(colors[i], colors[i + 1], scaled - i);
+}
+
 function getDotColor(cfg, bx, by, W, H, palette) {
   const mode = cfg.dotColorMode;
   if (mode === 'solid') return cfg.dotColor || '#4f7fff';
 
   if (mode === 'gradient') {
-    const a = cfg.gradColorA || '#4f7fff', b = cfg.gradColorB || '#ff4fa0';
+    const stops = [cfg.gradColorA, cfg.gradColorB, cfg.gradColorC, cfg.gradColorD, cfg.gradColorE]
+      .filter(c => c && c.trim());
+    if (stops.length === 0) return '#4f7fff';
     const dir = cfg.gradientDir || 'horizontal';
     let t = 0;
     if (dir === 'horizontal') t = bx / W;
@@ -93,7 +103,7 @@ function getDotColor(cfg, bx, by, W, H, palette) {
       const dx = bx - W/2, dy = by - H/2;
       t = Math.min(Math.sqrt(dx*dx+dy*dy) / (Math.max(W,H)*0.6), 1);
     }
-    return lerpColor(a, b, Math.max(0, Math.min(1, t)));
+    return lerpMultiColor(stops, t);
   }
 
   if (mode === 'palette' && palette) {
@@ -198,7 +208,7 @@ class DotRenderer {
 
   getAnimatedValues(dot, t, cfg) {
     const { animType, animSpeed, amplitude, stagger, frequency, opacityMin, opacityMax, noiseSeed } = cfg;
-    const speed = (animSpeed / 50) * 0.025;
+    const speed = (animSpeed / 50) * 0.005;
     const amp = amplitude / 100;
     const oMin = opacityMin / 100, oMax = opacityMax / 100;
     const freq = frequency / 50;

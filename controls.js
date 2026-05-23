@@ -9,6 +9,7 @@ class Controls {
     this._setupSelect();
     this._setupPreviewSize();
     this._setupPresetGrid();
+    this._setupMyPresets();
     this._setupPalettePicker();
     this._setupExport();
     this._setupHeaderActions();
@@ -86,6 +87,9 @@ class Controls {
       ['dotColor',     'dotColorText',     'dotColor'],
       ['gradColorA',   'gradColorAText',   'gradColorA'],
       ['gradColorB',   'gradColorBText',   'gradColorB'],
+      ['gradColorC',   'gradColorCText',   'gradColorC'],
+      ['gradColorD',   'gradColorDText',   'gradColorD'],
+      ['gradColorE',   'gradColorEText',   'gradColorE'],
     ];
 
     pairs.forEach(([pickId, textId, key]) => {
@@ -186,6 +190,102 @@ class Controls {
         this.app.renderer.renderToCanvas(canvas, preset.config, 800);
       }, 50);
     });
+  }
+
+  _setupMyPresets() {
+    const STORAGE_KEY = 'dotgrid_saved_presets';
+
+    const loadSaved = () => {
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+      catch(e) { return []; }
+    };
+
+    const saveToDisk = (presets) => {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(presets));
+    };
+
+    const renderCard = (preset, presets) => {
+      const grid = document.getElementById('myPresetGrid');
+      const card = document.createElement('div');
+      card.className = 'preset-card';
+      card.dataset.id = preset.id;
+
+      const canvas = document.createElement('canvas');
+      canvas.width = 160;
+      canvas.height = 90;
+      card.appendChild(canvas);
+
+      const label = document.createElement('div');
+      label.className = 'preset-label';
+      label.textContent = preset.name;
+      card.appendChild(label);
+
+      const del = document.createElement('button');
+      del.className = 'preset-delete';
+      del.innerHTML = '×';
+      del.title = 'Delete preset';
+      del.addEventListener('click', e => {
+        e.stopPropagation();
+        const updated = loadSaved().filter(p => p.id !== preset.id);
+        saveToDisk(updated);
+        card.remove();
+        document.getElementById('noPresetsMsg').style.display = updated.length === 0 ? '' : 'none';
+      });
+      card.appendChild(del);
+
+      card.addEventListener('click', () => {
+        document.querySelectorAll('.preset-card').forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        this.app.applyPreset(preset);
+      });
+
+      grid.appendChild(card);
+      setTimeout(() => this.app.renderer.renderToCanvas(canvas, preset.config, 800), 50);
+    };
+
+    const refresh = () => {
+      const grid = document.getElementById('myPresetGrid');
+      const noMsg = document.getElementById('noPresetsMsg');
+      // Remove all existing custom cards
+      grid.querySelectorAll('.preset-card').forEach(c => c.remove());
+      const presets = loadSaved();
+      noMsg.style.display = presets.length === 0 ? '' : 'none';
+      presets.forEach(p => renderCard(p, presets));
+    };
+
+    // Save button shows the inline form
+    document.getElementById('btnSavePreset').addEventListener('click', () => {
+      const form = document.getElementById('savePresetForm');
+      form.style.display = '';
+      document.getElementById('presetNameInput').value = '';
+      document.getElementById('presetNameInput').focus();
+    });
+
+    document.getElementById('btnCancelSavePreset').addEventListener('click', () => {
+      document.getElementById('savePresetForm').style.display = 'none';
+    });
+
+    const confirmSave = () => {
+      const name = document.getElementById('presetNameInput').value.trim();
+      if (!name) return;
+      const preset = { id: 'custom_' + Date.now(), name, config: { ...this.app.cfg } };
+      const presets = loadSaved();
+      presets.push(preset);
+      saveToDisk(presets);
+      document.getElementById('savePresetForm').style.display = 'none';
+      renderCard(preset, presets);
+      document.getElementById('noPresetsMsg').style.display = 'none';
+      this.app.toast(`"${name}" saved`);
+    };
+
+    document.getElementById('btnConfirmSavePreset').addEventListener('click', confirmSave);
+    document.getElementById('presetNameInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') confirmSave();
+      if (e.key === 'Escape') document.getElementById('savePresetForm').style.display = 'none';
+    });
+
+    // Load any saved presets on startup
+    refresh();
   }
 
   _setupPalettePicker() {
@@ -300,7 +400,7 @@ class Controls {
     });
 
     // Colors
-    const colorMap = { bgColor: ['bgColor','bgColorText'], dotColor: ['dotColor','dotColorText'], gradColorA: ['gradColorA','gradColorAText'], gradColorB: ['gradColorB','gradColorBText'] };
+    const colorMap = { bgColor: ['bgColor','bgColorText'], dotColor: ['dotColor','dotColorText'], gradColorA: ['gradColorA','gradColorAText'], gradColorB: ['gradColorB','gradColorBText'], gradColorC: ['gradColorC','gradColorCText'], gradColorD: ['gradColorD','gradColorDText'], gradColorE: ['gradColorE','gradColorEText'] };
     Object.entries(colorMap).forEach(([key, [pickId, textId]]) => {
       const pick = document.getElementById(pickId), text = document.getElementById(textId);
       if (pick && cfg[key]) pick.value = cfg[key];
