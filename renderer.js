@@ -208,7 +208,7 @@ class DotRenderer {
 
   getAnimatedValues(dot, t, cfg) {
     const { animType, animSpeed, amplitude, stagger, frequency, opacityMin, opacityMax, noiseSeed } = cfg;
-    const speed = (animSpeed / 50) * 0.005;
+    const speed = (animSpeed / 50) * 0.001;
     const amp = amplitude / 100;
     const oMin = opacityMin / 100, oMax = opacityMax / 100;
     const freq = frequency / 50;
