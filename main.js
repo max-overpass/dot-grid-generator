@@ -18,6 +18,9 @@ const DEFAULT_CONFIG = {
   dotColor: '#4f7fff',
   gradColorA: '#4f7fff',
   gradColorB: '#ff4fa0',
+  gradColorC: '#ffb347',
+  gradColorD: '#00e87a',
+  gradColorE: '#c471ed',
   gradientDir: 'horizontal',
   palette: 'neon',
 
